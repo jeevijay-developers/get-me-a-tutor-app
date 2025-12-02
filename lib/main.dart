@@ -40,8 +40,6 @@ import 'package:get_me_a_tutor/import_export.dart';
 //     );
 //   }
 // }
-import 'package:get_me_a_tutor/import_export.dart';
-
 void main() {
   runApp(
     MultiProvider(
