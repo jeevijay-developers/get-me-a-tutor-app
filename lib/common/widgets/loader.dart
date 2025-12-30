@@ -6,7 +6,7 @@ class Loader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: CircularProgressIndicator(
-        color: GlobalVariables.appGreenDark,
+        color: GlobalVariables.selectedColor,
       ),
     );
   }

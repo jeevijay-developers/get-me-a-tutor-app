@@ -2,7 +2,8 @@ import 'package:get_me_a_tutor/import_export.dart';
 
 class OtpVerifyScreen extends StatefulWidget {
   static const String routeName = '/otpVerifyScreen';
-  const OtpVerifyScreen({super.key});
+  final String email;
+  const OtpVerifyScreen({super.key, required this.email});
 
   @override
   State<OtpVerifyScreen> createState() => _OtpVerifyScreenState();
@@ -10,16 +11,7 @@ class OtpVerifyScreen extends StatefulWidget {
 
 class _OtpVerifyScreenState extends State<OtpVerifyScreen> {
   final _formKey = GlobalKey<FormState>();
-  final List<TextEditingController> _phoneOtpControllers = List.generate(
-    6,
-    (index) => TextEditingController(),
-  );
-
-  final List<FocusNode> _phoneOtpFocusNodes = List.generate(
-    6,
-    (index) => FocusNode(),
-  );
-
+  bool _isResendingOtp = false;
   final List<TextEditingController> _emailOtpControllers = List.generate(
     6,
     (index) => TextEditingController(),
@@ -32,12 +24,6 @@ class _OtpVerifyScreenState extends State<OtpVerifyScreen> {
 
   @override
   void dispose() {
-    for (var controller in _phoneOtpControllers) {
-      controller.dispose();
-    }
-    for (var focusNode in _phoneOtpFocusNodes) {
-      focusNode.dispose();
-    }
     for (var controller in _emailOtpControllers) {
       controller.dispose();
     }
@@ -45,14 +31,6 @@ class _OtpVerifyScreenState extends State<OtpVerifyScreen> {
       focusNode.dispose();
     }
     super.dispose();
-  }
-
-  void _onPhoneOtpChanged(int index, String value) {
-    if (value.length == 1 && index < 5) {
-      _phoneOtpFocusNodes[index + 1].requestFocus();
-    } else if (value.isEmpty && index > 0) {
-      _phoneOtpFocusNodes[index - 1].requestFocus();
-    }
   }
 
   void _onEmailOtpChanged(int index, String value) {
@@ -66,22 +44,13 @@ class _OtpVerifyScreenState extends State<OtpVerifyScreen> {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    // Base design width is 393px, calculate responsive dimensions
     final scaleFactor = screenWidth / 393;
 
-    // Icon dimensions
-    final iconSize = 180 * scaleFactor;
-
-    // Text dimensions
-    final primaryTextSize = 25 * scaleFactor;
-    final secondaryTextSize = 18 * scaleFactor;
-    final instructionTextSize = 15 * scaleFactor;
-
     // OTP box dimensions
-    final otpBoxSize = 40 * scaleFactor;
+    final otpBoxSize = 50 * scaleFactor;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: GlobalVariables.backgroundColor,
       body: GestureDetector(
         onTap: () {
           FocusScope.of(context).unfocus();
@@ -91,143 +60,45 @@ class _OtpVerifyScreenState extends State<OtpVerifyScreen> {
             child: Form(
               key: _formKey,
               child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 25 * scaleFactor),
+                padding: EdgeInsets.symmetric(horizontal: 24 * scaleFactor),
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SizedBox(height: 20),
-                    // Icon
-                    Center(
-                      child: Image.asset(
-                        'assets/otp.png',
-                        width: iconSize,
-                        height: iconSize,
+                    SizedBox(height: 16 * scaleFactor),
+                    // Back Button
+                    IconButton(
+                      icon: Icon(
+                        Icons.chevron_left,
+                        size: 32 * scaleFactor,
+                        color: GlobalVariables.primaryTextColor,
                       ),
+                      onPressed: () => Navigator.pop(context),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
                     ),
-
+                    SizedBox(height: 24 * scaleFactor),
                     // Title
-                    Center(
-                      child: PrimaryText(
-                        text: "Otp Verification",
-                        size: primaryTextSize,
-                      ),
+                    PrimaryText(
+                      text: 'OTP Verification',
+                      size: 28 * scaleFactor,
                     ),
-
-                    SizedBox(height: 10),
+                    SizedBox(height: 8 * scaleFactor),
                     // Subtitle
-                    Center(
-                      child: SecondaryText(
-                        text: "Verify your contact information",
-                        size: secondaryTextSize,
-                      ),
+                    SecondaryText(
+                      text:
+                          'Enter the OTP sent to your email address to verify your account.',
+                      size: 14 * scaleFactor,
                     ),
-
-                    SizedBox(height: 30),
+                    SizedBox(height: 40 * scaleFactor),
                     // Instruction text
                     Align(
                       alignment: Alignment.centerLeft,
                       child: SecondaryText(
-                        text: "Enter the otp sent on your number",
-                        size: instructionTextSize,
+                        text: 'Enter the OTP sent on your email',
+                        size: 14 * scaleFactor,
                       ),
                     ),
-                    SizedBox(height: 20),
-                    // OTP Input Fields
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: List.generate(6, (index) {
-                        return SizedBox(
-                          width: otpBoxSize,
-                          height: otpBoxSize,
-                          child: TextFormField(
-                            controller: _phoneOtpControllers[index],
-                            focusNode: _phoneOtpFocusNodes[index],
-                            textAlign: TextAlign.center,
-                            keyboardType: TextInputType.number,
-                            maxLength: 1,
-                            style: TextStyle(
-                              fontSize: 24 * scaleFactor,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return ''; // triggers red border without text
-                              }
-                              return null;
-                            },
-                            autovalidateMode:
-                                AutovalidateMode.onUserInteraction,
-                            decoration: InputDecoration(
-                              counterText: '',
-                              isDense: true,
-                              errorStyle: const TextStyle(
-                                fontSize: 0,
-                                height: 0,
-                              ),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(
-                                  8 * scaleFactor,
-                                ),
-                                borderSide: const BorderSide(
-                                  color: GlobalVariables.primaryTextColor,
-                                ),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(
-                                  8 * scaleFactor,
-                                ),
-                                borderSide: const BorderSide(
-                                  color: GlobalVariables.primaryTextColor,
-                                  width: 2,
-                                ),
-                              ),
-                              errorBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(
-                                  8 * scaleFactor,
-                                ),
-                                borderSide: BorderSide(
-                                  color: Colors.red,
-                                  width: 2,
-                                ),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(
-                                  8 * scaleFactor,
-                                ),
-                                borderSide: const BorderSide(
-                                  color: GlobalVariables.primaryTextColor,
-                                ),
-                              ),
-                              contentPadding: EdgeInsets.zero,
-                            ),
-
-                            onChanged: (value) =>
-                                _onPhoneOtpChanged(index, value),
-                          ),
-                        );
-                      }),
-                    ),
-                    SizedBox(height: 4),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: TextButton(
-                        style: TextButton.styleFrom(padding: EdgeInsets.zero),
-                        onPressed: () {},
-                        child: SecondaryText(
-                          text: "Resend OTP",
-                          size: 15 * scaleFactor,
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 20),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: SecondaryText(
-                        text: "Enter the otp sent on your Email",
-                        size: instructionTextSize,
-                      ),
-                    ),
-                    SizedBox(height: 20),
+                    SizedBox(height: 16 * scaleFactor),
                     // OTP Input Fields
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -240,10 +111,12 @@ class _OtpVerifyScreenState extends State<OtpVerifyScreen> {
                             focusNode: _emailOtpFocusNodes[index],
                             textAlign: TextAlign.center,
                             keyboardType: TextInputType.number,
+                            cursorColor: GlobalVariables.secondaryTextColor,
                             maxLength: 1,
                             style: TextStyle(
                               fontSize: 24 * scaleFactor,
                               fontWeight: FontWeight.bold,
+                              color: GlobalVariables.primaryTextColor,
                             ),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
@@ -260,26 +133,26 @@ class _OtpVerifyScreenState extends State<OtpVerifyScreen> {
                                 fontSize: 0,
                                 height: 0,
                               ),
+                              filled: true,
+                              fillColor: Colors.white,
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(
-                                  8 * scaleFactor,
+                                  12 * scaleFactor,
                                 ),
-                                borderSide: const BorderSide(
-                                  color: GlobalVariables.primaryTextColor,
-                                ),
+                                borderSide: BorderSide.none,
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(
-                                  8 * scaleFactor,
+                                  12 * scaleFactor,
                                 ),
-                                borderSide: const BorderSide(
-                                  color: GlobalVariables.primaryTextColor,
+                                borderSide: BorderSide(
+                                  color: GlobalVariables.selectedColor,
                                   width: 2,
                                 ),
                               ),
                               errorBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(
-                                  8 * scaleFactor,
+                                  12 * scaleFactor,
                                 ),
                                 borderSide: BorderSide(
                                   color: Colors.red,
@@ -288,77 +161,95 @@ class _OtpVerifyScreenState extends State<OtpVerifyScreen> {
                               ),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(
-                                  8 * scaleFactor,
+                                  12 * scaleFactor,
                                 ),
-                                borderSide: const BorderSide(
-                                  color: GlobalVariables.primaryTextColor,
-                                ),
+                                borderSide: BorderSide.none,
                               ),
                               contentPadding: EdgeInsets.zero,
                             ),
-
                             onChanged: (value) =>
                                 _onEmailOtpChanged(index, value),
                           ),
                         );
                       }),
                     ),
-                    SizedBox(height: 4),
+                    SizedBox(height: 8 * scaleFactor),
+                    // Resend OTP
                     Align(
                       alignment: Alignment.centerRight,
-                      child: TextButton(
+                      child: _isResendingOtp
+                          ? const Loader()
+                          : TextButton(
                         style: TextButton.styleFrom(padding: EdgeInsets.zero),
-                        onPressed: () {},
-                        child: SecondaryText(
-                          text: "Resend OTP",
-                          size: 15 * scaleFactor,
+                        onPressed: () async {
+                          setState(() {
+                            _isResendingOtp = true;
+                          });
+
+                          final authProvider =
+                          Provider.of<AuthProvider>(context, listen: false);
+
+                          await authProvider.resendEmailOtp(
+                            context: context,
+                          );
+
+                          setState(() {
+                            _isResendingOtp = false;
+                          });
+                        },
+                        child: Text(
+                          'Resend OTP',
+                          style: GoogleFonts.roboto(
+                            fontSize: 14 * scaleFactor,
+                            fontWeight: FontWeight.w400,
+                            color: GlobalVariables.selectedColor,
+                          ),
                         ),
                       ),
                     ),
-                    SizedBox(height: 40),
+
+                    SizedBox(height: 32 * scaleFactor),
                     // Verify Button
-                    Center(
-                      child: Consumer<AuthProvider>(
-                        builder: (context, authProvider, _) {
-                          return authProvider.isLoading
-                              ? const Loader()
-                              : CustomButton(
-                                  text: "Verify",
-                                  isFilled: true,
-                                  onTap: () async {
-                                    FocusScope.of(context).unfocus();
+                    Consumer<AuthProvider>(
+                      builder: (context, authProvider, _) {
+                        return authProvider.isLoading
+                            ? const Loader()
+                            : CustomButton(
+                                text: 'Verify',
+                                onTap: () async {
+                                  FocusScope.of(context).unfocus();
 
-                                    if (_formKey.currentState!.validate()) {
-                                      // Combine OTP digits
-                                      final otp = _emailOtpControllers
-                                          .map((c) => c.text)
-                                          .join();
+                                  if (_formKey.currentState!.validate()) {
+                                    // Combine OTP digits
+                                    final otp = _emailOtpControllers
+                                        .map((c) => c.text)
+                                        .join();
 
-                                      final authProvider =
-                                          Provider.of<AuthProvider>(
-                                            context,
-                                            listen: false,
-                                          );
-                                      final success = await authProvider
-                                          .verifyEmailOtp(
-                                            otp: otp,
-                                            context: context,
-                                          );
-
-                                      if (success) {
-                                        Navigator.pushNamedAndRemoveUntil(
+                                    final authProvider =
+                                        Provider.of<AuthProvider>(
                                           context,
-                                          LoginScreen.routeName,
-                                              (route) => false,
+                                          listen: false,
+                                        );
+                                    final role = await authProvider
+                                        .verifyEmailOtp(
+                                          otp: otp,
+                                          context: context,
                                         );
 
-                                      }
+                                    if (role!=null) {
+                                      Navigator.pushNamedAndRemoveUntil(
+                                        context,
+                                        SignupSuccessScreen.routeName,
+                                        (route) => false,
+                                        arguments: role,
+                                      );
                                     }
-                                  },
-                                );
-                        },
-                      ),
+                                  }
+                                },
+                              );
+                      },
                     ),
+                    SizedBox(height: 24 * scaleFactor),
                   ],
                 ),
               ),

@@ -3,50 +3,40 @@ import 'package:get_me_a_tutor/import_export.dart';
 class CustomButton extends StatelessWidget {
   final String text;
   final VoidCallback onTap;
-  final bool isFilled;
+  
   const CustomButton({
     super.key,
     required this.text,
     required this.onTap,
-    required this.isFilled,
   });
 
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final buttonWidth = (146 / 393) * screenWidth;
-    final buttonHeight = 54.0;
+    final scaleFactor = screenWidth / 393;
+    final buttonHeight = 56 * scaleFactor;
     
     return SizedBox(
-      width: buttonWidth,
+      width: double.infinity,
       height: buttonHeight,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          gradient: isFilled ? GlobalVariables.greenGradient : null,
-          borderRadius: BorderRadius.circular(30),
-        ),
-        child: OutlinedButton(
-          onPressed: onTap,
-          style: OutlinedButton.styleFrom(
-            backgroundColor: Colors.transparent,
-            side: const BorderSide(
-              color: GlobalVariables.appGreenDark,
-              width: 1,
-            ),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(30),
-            ),
-            padding: const EdgeInsets.symmetric(
-              horizontal: 24,
-              vertical: 12,
-            ),
+      child: ElevatedButton(
+        onPressed: onTap,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: GlobalVariables.selectedColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30 * scaleFactor),
           ),
-        child: SecondaryText(
-          text: text,
-          size: 20,
-          color: isFilled ? Colors.white : GlobalVariables.appGreenDark,
+          elevation: 0,
+          padding: EdgeInsets.zero,
         ),
-      ),
+        child: Text(
+          text,
+          style: GoogleFonts.inter(
+            fontSize: 18 * scaleFactor,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
       ),
     );
   }

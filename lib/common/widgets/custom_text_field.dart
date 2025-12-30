@@ -4,17 +4,21 @@ class CustomTextField extends StatefulWidget {
   final TextEditingController controller;
   final String hintText;
   final int maxLines;
+  final bool readonly;
   final IconData? prefixIcon;
   final bool isPassword;
   final String? Function(String?)? validator;
+  final TextInputType? keyboardType;
   const CustomTextField({
     super.key,
     required this.controller,
     required this.hintText,
     this.maxLines = 1,
     this.prefixIcon,
+    this.readonly = false,
     this.isPassword = false,
     this.validator,
+    this.keyboardType,
   });
 
   @override
@@ -27,19 +31,24 @@ class _CustomTextFieldState extends State<CustomTextField> {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      keyboardType: widget.keyboardType,
       controller: widget.controller,
+      readOnly: widget.readonly,
       obscureText: widget.isPassword && _obscureText,
+      cursorColor: GlobalVariables.secondaryTextColor,
       decoration: InputDecoration(
         hintText: widget.hintText,
-        hintStyle: TextStyle(color: GlobalVariables.primaryTextColor),
+        hintStyle: TextStyle(color: GlobalVariables.secondaryTextColor),
+        filled: true,
+        fillColor: const Color(0xFFF5F5F5),
         prefixIcon: widget.prefixIcon != null
-            ? Icon(widget.prefixIcon, color: GlobalVariables.primaryTextColor)
+            ? Icon(widget.prefixIcon, color: GlobalVariables.secondaryTextColor)
             : null,
         suffixIcon: widget.isPassword
             ? IconButton(
                 icon: Icon(
                   _obscureText ? Icons.visibility_off : Icons.visibility,
-                  color: GlobalVariables.primaryTextColor,
+                  color: GlobalVariables.secondaryTextColor,
                 ),
                 onPressed: () {
                   setState(() {
@@ -49,22 +58,16 @@ class _CustomTextFieldState extends State<CustomTextField> {
               )
             : null,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(7.69),
-          borderSide: BorderSide(color: GlobalVariables.appGreenLight, width: 0.77),
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(7.69),
-          borderSide: BorderSide(
-            color: GlobalVariables.appGreenLight,
-            width: 1.2,
-          ),
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(7.69),
-          borderSide: BorderSide(
-            color: GlobalVariables.appGreenLight,
-            width: 1.2,
-          ),
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
         ),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       ),

@@ -1,9 +1,9 @@
-import 'package:http/http.dart' as http;
 import 'package:get_me_a_tutor/import_export.dart';
+import 'package:http/http.dart' as http;
 
 void httpErrorHandle({
-  required http.Response response,
   required BuildContext context,
+  required http.Response response,
   required VoidCallback onSuccess,
 }) {
   switch (response.statusCode) {
@@ -11,15 +11,30 @@ void httpErrorHandle({
     case 201:
       onSuccess();
       break;
-    case 400:
+
     case 401:
-    case 403:
-    case 404:
-    case 500:
-      final message = jsonDecode(response.body)['message'] ?? 'Error occurred';
-      showSnackBar(context, message);
+      _forceLogout(context);
       break;
+
     default:
-      showSnackBar(context, 'An error occurred: ${response.body}');
+      final resBody = jsonDecode(response.body);
+      showSnackBar(
+        context,
+        resBody['message'] ?? 'Something went wrong',
+      );
   }
+}
+
+void _forceLogout(BuildContext context) async {
+  final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
+  await authProvider.logout(context: context);
+
+  Navigator.pushNamedAndRemoveUntil(
+    context,
+    HomeScreenNew.routeName,
+        (route) => false,
+  );
+
+  showSnackBar(context, 'Session expired. Please login again.');
 }
