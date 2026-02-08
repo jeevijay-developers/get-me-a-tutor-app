@@ -48,7 +48,13 @@ class _ParentDashboardState extends State<ParentDashboard> {
 
       body: SafeArea(
         child: _currentIndex == 0
-            ? SingleChildScrollView(
+            ? RefreshIndicator(
+            onRefresh: () async {
+              await context
+                  .read<JobApplicationProvider>()
+                  .fetchRecentApplications(context);
+            },
+            child: SingleChildScrollView(
           padding: EdgeInsets.symmetric(horizontal: 16 * scale),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -284,21 +290,7 @@ class _ParentDashboardState extends State<ParentDashboard> {
                     children: provider.recentApplications.map(
                           (app) {
                         return RecentApplicationCard(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) =>
-                                    TutorApplicationScreen(
-                                      teacherName: app.tutorName,
-                                      tutorUserId:
-                                      app.tutorUserId,
-                                      applicationId: app.id,
-                                      currentStatus: app.status,
-                                    ),
-                              ),
-                            );
-                          },
+                          onTap: () {},
                           photo: app.tutorPhoto,
                           name: app.tutorName,
                           role: app.jobTitle,
@@ -313,6 +305,7 @@ class _ParentDashboardState extends State<ParentDashboard> {
               const SizedBox(height: 100),
             ],
           ),
+        )
         )
             : _currentIndex == 1
             ? const Center(child: Text('Jobs Screen'))

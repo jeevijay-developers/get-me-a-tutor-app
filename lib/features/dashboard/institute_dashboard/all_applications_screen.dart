@@ -74,6 +74,11 @@ class _AllApplicationsScreenState
 
               return RecentApplicationCard(
                 onTap: () {
+                  print('NAV tutorUserId: ${app.tutorUserId}');
+                  if (app.tutorUserId.isEmpty) {
+                    showSnackBar(context, 'Tutor profile unavailable');
+                    return;
+                  }
                   Navigator.push(
                     context,
                     MaterialPageRoute(

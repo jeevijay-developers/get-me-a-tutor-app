@@ -28,8 +28,6 @@ class _InstituteDashboardState extends State<InstituteDashboard> {
           .fetchRecentApplications(context);
     });
   }
-
-
   @override
   Widget build(BuildContext context) {
     final scale = MediaQuery.of(context).size.width / 393;
@@ -45,7 +43,13 @@ class _InstituteDashboardState extends State<InstituteDashboard> {
 
       body: SafeArea(
         child: _currentIndex == 0
-            ? SingleChildScrollView(
+            ?RefreshIndicator(
+            onRefresh: () async {
+              await context
+                  .read<JobApplicationProvider>()
+                  .fetchRecentApplications(context);
+            },
+            child:  SingleChildScrollView(
                 padding: EdgeInsets.symmetric(horizontal: 16 * scale),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -266,19 +270,7 @@ class _InstituteDashboardState extends State<InstituteDashboard> {
                         return Column(
                           children: provider.recentApplications.map((app) {
                             return RecentApplicationCard(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => TutorApplicationScreen(
-                                      teacherName: app.tutorName,
-                                      tutorUserId: app.tutorUserId,
-                                      applicationId: app.id,
-                                      currentStatus: app.status,
-                                    ),
-                                  ),
-                                );
-                              },
+                              onTap: () {},
                               photo: app.tutorPhoto,
                               name: app.tutorName,
                               role: app.jobTitle,
@@ -293,12 +285,14 @@ class _InstituteDashboardState extends State<InstituteDashboard> {
                   ],
                 ),
               )
+        )
             : _currentIndex == 1
             ? Text('Jobs Screen')
             : _currentIndex == 2
             ? TutorDiscoveryScreen()
             : InstituteProfileScreen(),
       ),
+
 
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,

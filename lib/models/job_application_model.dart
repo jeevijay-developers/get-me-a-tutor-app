@@ -20,7 +20,7 @@ class JobApplicationModel {
   factory JobApplicationModel.fromJson(Map<String, dynamic> json) {
     return JobApplicationModel(
       id: json['_id'],
-      tutorUserId: json['tutor']?['_id'] ?? '',
+      tutorUserId: json['tutor']?['_id']??'',
       tutorName: json['tutor']?['name'] ?? 'Tutor',
       tutorPhoto: json['tutor']?['photo']?['url'],
       jobTitle: json['job']?['title'] ?? 'Job',

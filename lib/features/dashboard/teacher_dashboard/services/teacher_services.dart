@@ -23,7 +23,9 @@ class TeacherServices {
           'Authorization': 'Bearer ${auth.token}',
         },
       );
-
+      print('TEACHER PROFILE STATUS: ${response.statusCode}');
+      print('TEACHER PROFILE BODY: ${response.body}');
+      print('TEACHER PROFILE HEADERS: ${response.headers}');
       TeacherModel? teacher;
 
       httpErrorHandle(
